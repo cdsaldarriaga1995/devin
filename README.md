@@ -456,23 +456,23 @@ This works with LangChain MCP adapters, CrewAI, AutoGen, LlamaIndex, and any fra
 | `nc_banner_grab` | Service banner grabbing via netcat |
 | `burp_health_check` | Verify Burp REST API connectivity |
 
-### 🤝 Assisted Pentest Workflow (Human-in-the-Loop)
+### 🤝 Flujo de Pentest Asistido (Validación con Humano en el Bucle)
 
-A validation layer that keeps the pentester as the final authority: the AI suggests/reproduces tests, BurpIA runs a second LLM analysis, and **you validate manually in Repeater before anything is reported**. Findings are centralized in a session registry and gated through the states `suggested → llm_reviewed → manually_validated → reported`.
+Una capa de validación que mantiene al pentester como autoridad final: la IA sugiere/reproduce pruebas, BurpIA hace un segundo análisis con LLM y **tú validas manualmente en Repeater antes de reportar nada**. Los hallazgos se centralizan en un registro de sesión y avanzan por los estados `suggested → llm_reviewed → manually_validated → reported`.
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `finding_add` | Register a finding in the central registry (starts as `suggested`) |
-| `finding_list` | List findings, filtered by status or severity |
-| `finding_update_status` | Advance a finding through the validation pipeline |
-| `finding_report` | Emit a PoC-style report — **only after `manually_validated`** |
-| `burp_get_filtered_issues` | Filter Burp scanner issues (severity/confidence/url) and optionally import them as findings |
-| `send_for_second_analysis` | Force a BurpIA second LLM analysis via the `X-BurpIA-AutoAnalyze` header, even when standard filters do not match |
-| `validation_workflow` | Orchestrate the 3-step flow (suggest → LLM analysis → mandatory manual checkpoint); never auto-reports |
-| `checklist_show` / `checklist_check` / `checklist_reset` | Track the pentester checklist (OWASP WSTG-based) throughout the engagement |
-| `workflow_cost_report` | Show Burp/LLM call counts and cost-reduction guidance |
+| `finding_add` | Registra un hallazgo en el registro central (inicia como `suggested`) |
+| `finding_list` | Lista los hallazgos, filtrados por estado o severidad |
+| `finding_update_status` | Avanza un hallazgo por el pipeline de validación |
+| `finding_report` | Genera un reporte tipo PoC — **solo tras `manually_validated`** |
+| `burp_get_filtered_issues` | Filtra los hallazgos del scanner de Burp (severidad/confianza/url) y opcionalmente los importa como findings |
+| `send_for_second_analysis` | Fuerza un segundo análisis LLM de BurpIA vía el header `X-BurpIA-AutoAnalyze`, incluso cuando no coincide con los filtros estándar |
+| `validation_workflow` | Orquesta el flujo de 3 pasos (sugerir → análisis LLM → checkpoint manual obligatorio); nunca reporta solo |
+| `checklist_show` / `checklist_check` / `checklist_reset` | Mantiene el checklist del pentester (basado en OWASP WSTG) durante todo el engagement |
+| `workflow_cost_report` | Muestra los contadores de llamadas a Burp/LLM y guía para reducir costos |
 
-> This layer integrates the best of a Burp + BurpIA + MCP validation flow: centralized findings, scanner-issue filtering, a forced second LLM analysis, and an enforced human validation checkpoint — on top of the full Kali + Burp toolset.
+> Esta capa integra lo mejor de un flujo de validación Burp + BurpIA + MCP: hallazgos centralizados, filtrado de hallazgos del scanner, un segundo análisis LLM forzado y un checkpoint de validación humana obligatorio — sobre todo el toolset de Kali + Burp.
 
 ---
 
