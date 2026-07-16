@@ -456,6 +456,24 @@ This works with LangChain MCP adapters, CrewAI, AutoGen, LlamaIndex, and any fra
 | `nc_banner_grab` | Service banner grabbing via netcat |
 | `burp_health_check` | Verify Burp REST API connectivity |
 
+### 🤝 Assisted Pentest Workflow (Human-in-the-Loop)
+
+A validation layer that keeps the pentester as the final authority: the AI suggests/reproduces tests, BurpIA runs a second LLM analysis, and **you validate manually in Repeater before anything is reported**. Findings are centralized in a session registry and gated through the states `suggested → llm_reviewed → manually_validated → reported`.
+
+| Tool | Description |
+|------|-------------|
+| `finding_add` | Register a finding in the central registry (starts as `suggested`) |
+| `finding_list` | List findings, filtered by status or severity |
+| `finding_update_status` | Advance a finding through the validation pipeline |
+| `finding_report` | Emit a PoC-style report — **only after `manually_validated`** |
+| `burp_get_filtered_issues` | Filter Burp scanner issues (severity/confidence/url) and optionally import them as findings |
+| `send_for_second_analysis` | Force a BurpIA second LLM analysis via the `X-BurpIA-AutoAnalyze` header, even when standard filters do not match |
+| `validation_workflow` | Orchestrate the 3-step flow (suggest → LLM analysis → mandatory manual checkpoint); never auto-reports |
+| `checklist_show` / `checklist_check` / `checklist_reset` | Track the pentester checklist (OWASP WSTG-based) throughout the engagement |
+| `workflow_cost_report` | Show Burp/LLM call counts and cost-reduction guidance |
+
+> This layer integrates the best of a Burp + BurpIA + MCP validation flow: centralized findings, scanner-issue filtering, a forced second LLM analysis, and an enforced human validation checkpoint — on top of the full Kali + Burp toolset.
+
 ---
 
 ## 📖 Usage Examples

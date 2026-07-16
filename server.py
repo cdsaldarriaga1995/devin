@@ -82,6 +82,40 @@ cfg = {
     "tool_timeout": TOOL_TIMEOUT,
 }
 
+# ── Assisted-workflow shared state (Layer 4) ──────────────────────────────────
+# In-memory session state for the human-in-the-loop validation pipeline.
+# The findings registry, pentester checklist and a lightweight cost counter live
+# here so the AI client can centralise findings across many tool calls.
+
+FINDING_STATUSES = ["suggested", "llm_reviewed", "manually_validated", "reported"]
+
+# BurpIA (DragonJar) auto-analyze header — forces a second LLM analysis task even
+# when the request does not match BurpIA's standard filters.
+AUTO_ANALYZE_HEADER = "X-BurpIA-AutoAnalyze"
+
+# Default checklist derived from the OWASP Web Security Testing Guide (WSTG).
+DEFAULT_CHECKLIST = [
+    "Information gathering / recon",
+    "Configuration & deployment management",
+    "Identity & authentication testing",
+    "Authorization / access control",
+    "Session management",
+    "Input validation (SQLi, XSS, SSTI, injection)",
+    "Error handling & information disclosure",
+    "Cryptography / TLS",
+    "Business logic testing",
+    "Client-side testing (CORS, redirects, postMessage)",
+    "API / GraphQL testing",
+    "Reporting & PoC validation",
+]
+
+WORKFLOW_STATE: dict = {
+    "findings": {},                       # id -> finding dict
+    "next_id": 1,
+    "checklist": {i: False for i in DEFAULT_CHECKLIST},
+    "cost": {"burp_calls": 0, "llm_analyses": 0, "cli_runs": 0},
+}
+
 
 # ═════════════════════════════════════════════════════════════════════════════
 # ── LAYER 0: CORE HELPERS ────────────────────────────────────────────────────
@@ -1841,6 +1875,273 @@ def replay_and_diff(request_a: str, request_b: str,
             "identical": ra == rb}
 
 
+# ── Layer 4 helpers ───────────────────────────────────────────────────────────
+
+def _inject_header(raw_request: str, name: str, value: str) -> str:
+    """Insert or replace an HTTP header immediately after the request line."""
+    newline = "\r\n" if "\r\n" in raw_request else "\n"
+    lines = raw_request.splitlines(keepends=True)
+    if not lines:
+        return f"{name}: {value}"
+    if not lines[0].endswith(("\r\n", "\n")):
+        lines[0] += newline
+    header_line = f"{name}: {value}{newline}"
+    header_prefix = f"{name}:".lower()
+    for index, line in enumerate(lines[1:], start=1):
+        content = line.rstrip("\r\n")
+        if content.lower().startswith(header_prefix):
+            lines[index] = header_line
+            return "".join(lines)
+        if content == "":
+            lines.insert(index, header_line)
+            return "".join(lines)
+    lines.insert(1, header_line)
+    return "".join(lines)
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# ── LAYER 4: ASSISTED PENTEST WORKFLOW ──────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════
+
+@mcp.tool()
+def finding_add(title: str, target: str, severity: str = "info",
+                confidence: str = "tentative", evidence: str = "",
+                source: str = "manual") -> dict:
+    """Create a suggested finding in the shared workflow registry."""
+    finding_id = WORKFLOW_STATE["next_id"]
+    WORKFLOW_STATE["next_id"] += 1
+    now = time.time()
+    finding = {
+        "id": finding_id,
+        "title": title,
+        "target": target,
+        "severity": severity,
+        "confidence": confidence,
+        "evidence": evidence,
+        "source": source,
+        "status": "suggested",
+        "timestamp": now,
+        "timestamp_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+    }
+    if severity not in {"info", "low", "medium", "high", "critical"}:
+        finding["warning"] = (
+            "Severity is not one of: info, low, medium, high, critical."
+        )
+    WORKFLOW_STATE["findings"][finding_id] = finding
+    return finding
+
+
+@mcp.tool()
+def finding_list(status: str = "", severity: str = "") -> dict:
+    """List workflow findings, optionally filtered by status and severity."""
+    findings = list(WORKFLOW_STATE["findings"].values())
+    if status:
+        findings = [f for f in findings if f.get("status") == status]
+    if severity:
+        findings = [f for f in findings if f.get("severity") == severity]
+    return {"count": len(findings), "findings": findings}
+
+
+@mcp.tool()
+def finding_update_status(finding_id: int, status: str) -> dict:
+    """Update a finding status in the human-in-the-loop workflow."""
+    if status not in FINDING_STATUSES:
+        return {
+            "error": f"Invalid status '{status}'. Expected one of: "
+                     f"{', '.join(FINDING_STATUSES)}"
+        }
+    finding = WORKFLOW_STATE["findings"].get(finding_id)
+    if finding is None:
+        return {"error": f"Finding id {finding_id} does not exist."}
+    finding["status"] = status
+    return finding
+
+
+@mcp.tool()
+def finding_report(finding_id: int) -> dict:
+    """Create a PoC-style report only after manual validation."""
+    finding = WORKFLOW_STATE["findings"].get(finding_id)
+    if finding is None:
+        return {"error": f"Finding id {finding_id} does not exist."}
+    if finding.get("status") != "manually_validated":
+        return {
+            "error": "Finding must be manually validated before reporting. "
+                     "Use finding_update_status(id, 'manually_validated') "
+                     "after validating it in Burp Repeater.",
+            "current_status": finding.get("status"),
+        }
+    finding["status"] = "reported"
+    return {
+        "finding_id": finding_id,
+        "title": finding["title"],
+        "target": finding["target"],
+        "severity": finding["severity"],
+        "confidence": finding["confidence"],
+        "evidence": finding["evidence"],
+        "poc_template": (
+            f"## {finding['title']}\n\n"
+            f"**Target:** {finding['target']}\n"
+            f"**Severity:** {finding['severity']}\n"
+            f"**Confidence:** {finding['confidence']}\n\n"
+            f"### Evidence\n{finding['evidence'] or 'Add validated evidence here.'}\n\n"
+            "### Reproduction\n"
+            "1. Open the validated request in Burp Repeater.\n"
+            "2. Send the request and observe the vulnerable behavior.\n"
+            "3. Record the response and impact."
+        ),
+    }
+
+
+@mcp.tool()
+def burp_get_filtered_issues(severity: str = "", confidence: str = "",
+                             url_contains: str = "", limit: int = 50,
+                             import_to_findings: bool = False) -> dict:
+    """Filter Burp scanner issues and optionally import them as findings."""
+    WORKFLOW_STATE["cost"]["burp_calls"] += 1
+    raw_issues = get_scanner_issues()
+    if not isinstance(raw_issues, list):
+        return {"raw": raw_issues}
+    limit = max(0, limit)
+    filtered = []
+    for issue in raw_issues:
+        if not isinstance(issue, dict):
+            continue
+        if severity and str(issue.get("severity", "")).lower() != severity.lower():
+            continue
+        if confidence and str(issue.get("confidence", "")).lower() != confidence.lower():
+            continue
+        if url_contains:
+            url_values = [
+                str(issue.get(key, "")) for key in ("url", "origin", "host")
+            ]
+            if not any(url_contains.lower() in value.lower()
+                       for value in url_values):
+                continue
+        filtered.append(issue)
+    filtered = filtered[:limit]
+    imported = 0
+    if import_to_findings:
+        for issue in filtered:
+            target = next(
+                (issue.get(key, "") for key in ("url", "origin", "host")
+                 if issue.get(key)),
+                "",
+            )
+            title = issue.get("issueName") or issue.get("name") or issue.get("title") or "Burp scanner issue"
+            finding_add(
+                title=str(title),
+                target=str(target),
+                severity=str(issue.get("severity", "info")),
+                confidence=str(issue.get("confidence", "tentative")),
+                evidence=str(issue.get("issueDetail") or issue.get("evidence") or issue),
+                source="burp_scanner",
+            )
+            imported += 1
+    return {"count": len(filtered), "issues": filtered, "imported": imported}
+
+
+@mcp.tool()
+def send_for_second_analysis(request: str, host: str = "", port: int = 443,
+                             use_https: bool = True, context: str = "") -> dict:
+    """Force BurpIA's second LLM analysis, even when filters do not match."""
+    modified_request = _inject_header(request, AUTO_ANALYZE_HEADER,
+                                      context or "1")
+    response = _burp_post(
+        "send_http1_request",
+        {"request": modified_request, "host": host, "port": port,
+         "useHttps": use_https},
+    )
+    WORKFLOW_STATE["cost"]["llm_analyses"] += 1
+    return {
+        "auto_analyze_header": AUTO_ANALYZE_HEADER,
+        "sent": True,
+        "burp_response": response,
+    }
+
+
+@mcp.tool()
+def validation_workflow(target: str, technique: str, request: str = "",
+                        host: str = "", port: int = 443,
+                        use_https: bool = True,
+                        severity: str = "info") -> dict:
+    """Run assisted validation while requiring a manual Repeater checkpoint."""
+    finding = finding_add(
+        title=f"{technique} on {target}",
+        target=target,
+        severity=severity,
+        source="workflow",
+    )
+    finding_id = finding["id"]
+    steps = [{"step": 1, "status": "suggested", "finding_id": finding_id}]
+    if request:
+        analysis = send_for_second_analysis(
+            request, host, port, use_https, context=technique
+        )
+        finding_update_status(finding_id, "llm_reviewed")
+        finding["llm_analysis"] = analysis
+        steps.append({"step": 2, "status": "llm_reviewed",
+                      "response": analysis})
+    else:
+        steps.append({"step": 2, "status": "skipped",
+                      "reason": "No request was provided."})
+    next_action = (
+        "Validate the finding manually in Burp Repeater before reporting. "
+        f"Then use finding_update_status({finding_id}, "
+        "'manually_validated') followed by finding_report("
+        f"{finding_id})."
+    )
+    steps.append({"step": 3, "status": "manual_checkpoint",
+                  "instruction": next_action})
+    return {"finding_id": finding_id, "steps": steps, "next_action": next_action}
+
+
+@mcp.tool()
+def checklist_show() -> dict:
+    """Show progress through the pentest checklist."""
+    items = WORKFLOW_STATE["checklist"]
+    done = sum(1 for checked in items.values() if checked)
+    return {"progress": f"{done}/{len(items)}", "items": dict(items)}
+
+
+@mcp.tool()
+def checklist_check(item: str, done: bool = True) -> dict:
+    """Mark a checklist item, allowing case-insensitive substring matching."""
+    items = WORKFLOW_STATE["checklist"]
+    if item in items:
+        matched = item
+    else:
+        candidates = [key for key in items if item.lower() in key.lower()]
+        if not candidates:
+            return {"error": f"Checklist item '{item}' does not match any item."}
+        if len(candidates) > 1:
+            return {"error": f"Checklist item '{item}' is ambiguous.",
+                    "candidates": candidates}
+        matched = candidates[0]
+    items[matched] = done
+    return {"item": matched, "done": done, **checklist_show()}
+
+
+@mcp.tool()
+def checklist_reset() -> dict:
+    """Reset all pentest checklist items to incomplete."""
+    for item in WORKFLOW_STATE["checklist"]:
+        WORKFLOW_STATE["checklist"][item] = False
+    return checklist_show()
+
+
+@mcp.tool()
+def workflow_cost_report() -> dict:
+    """Report workflow resource usage and ways to reduce BurpIA costs."""
+    return {
+        "cost": dict(WORKFLOW_STATE["cost"]),
+        "guidance": (
+            "Each send_for_second_analysis call consumes one BurpIA LLM call. "
+            "Group requests and validate findings manually before re-analyzing "
+            "to reduce costs."
+        ),
+    }
+
+
 # ═════════════════════════════════════════════════════════════════════════════
 # ── WORKFLOW TOOLS ───────────────────────────────────────────────────────────
 # ═════════════════════════════════════════════════════════════════════════════
@@ -1986,6 +2287,13 @@ def list_all_tools() -> dict:
             "recon_target", "full_web_audit",
             "chain_vulnerabilities_into_narrative", "list_all_tools",
             "burp_health_check",
+        ],
+        "assisted_workflow": [
+            "finding_add", "finding_list", "finding_update_status",
+            "finding_report", "burp_get_filtered_issues",
+            "send_for_second_analysis", "validation_workflow",
+            "checklist_show", "checklist_check", "checklist_reset",
+            "workflow_cost_report",
         ],
     }
 
