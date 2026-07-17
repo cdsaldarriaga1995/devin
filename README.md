@@ -2,7 +2,7 @@
 
 <div align="center">
 
-### *The Ultimate AI-Powered Penetration Testing MCP Server*
+### *El servidor MCP definitivo para pruebas de penetración impulsadas por IA*
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![MCP Protocol](https://img.shields.io/badge/MCP-v1.2%2B-purple?style=for-the-badge&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io)
@@ -11,26 +11,26 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hyperps/kali-burp-mcp-bridge?style=for-the-badge&color=yellow)](https://github.com/hyperps/kali-burp-mcp-bridge/stargazers)
 
-**Connect Claude, ChatGPT, Cursor, and any MCP-compatible AI to your full Kali Linux + Burp Suite security toolkit.**
+**Conecta Claude, ChatGPT, Cursor y cualquier IA compatible con MCP a todo tu conjunto de herramientas de seguridad de Kali Linux + Burp Suite.**
 
-Run `nmap`, `sqlmap`, `metasploit`, `hydra`, `nuclei` and 60+ more tools — all from a single chat prompt.
+Ejecuta `nmap`, `sqlmap`, `metasploit`, `hydra`, `nuclei` y más de 60 herramientas, todo desde un único mensaje de chat.
 
-[🚀 Quick Start](#-quick-start) · [🔧 All Tools](#-available-tools) · [🤖 AI Setup](#-connecting-your-ai) · [📖 Examples](#-usage-examples) · [🙏 Credits](#-credits)
+[🚀 Inicio rápido](#-inicio-rápido) · [🔧 Todas las herramientas](#-herramientas-disponibles) · [🤖 Configuración de IA](#-conecta-tu-ia) · [📖 Ejemplos](#-ejemplos-de-uso) · [🙏 Créditos](#-créditos)
 
 </div>
 
 ---
 
-> ⚠️ **Legal Disclaimer:** This tool is intended for **authorized penetration testing and security research only**. Always obtain explicit written permission before testing any system you do not own. Misuse of this tool is illegal and unethical. The authors accept no liability for unauthorized use.
-#### This project is not intended to be exposed publicly without authentication. The kali-burp-mcp-bridge server is designed to run locally or behind a trusted boundary (e.g., internal lab environment, VPN, or secured reverse proxy) and is expected to be protected by an authentication token or equivalent access control mechanism at deployment time.
-#### The functions highlighted (Metasploit integration, CLI wrappers, file-based tooling, etc.) are intentionally designed for controlled offensive security environments where the operator is already trusted and authorized. This bridge acts as a thin execution layer between MCP and local security tooling — not as a hardened multi-tenant API service.
+> ⚠️ **Aviso legal:** Esta herramienta está destinada **únicamente a pruebas de penetración autorizadas y a la investigación de seguridad**. Obtén siempre permiso explícito y por escrito antes de probar cualquier sistema que no sea de tu propiedad. El uso indebido de esta herramienta es ilegal y poco ético. Los autores no asumen ninguna responsabilidad por el uso no autorizado.
+#### Este proyecto no está diseñado para exponerse públicamente sin autenticación. El servidor kali-burp-mcp-bridge está pensado para ejecutarse localmente o detrás de un límite de confianza (por ejemplo, un entorno de laboratorio interno, una VPN o un proxy inverso protegido), y debe estar protegido por un token de autenticación o un mecanismo equivalente de control de acceso durante el despliegue.
+#### Las funciones destacadas (integración con Metasploit, wrappers de CLI, herramientas basadas en archivos, etc.) están diseñadas intencionadamente para entornos controlados de seguridad ofensiva en los que el operador ya es de confianza y está autorizado. Este bridge actúa como una capa fina de ejecución entre MCP y las herramientas de seguridad locales, no como un servicio API multiinquilino reforzado.
 ---
 
-## 📌 What Is This?
+## 📌 ¿Qué es esto?
 
-`kali-burp-mcp-bridge` (entry point: **`server.py`**) is a **Model Context Protocol (MCP) server** that gives any AI assistant — Claude, ChatGPT, Cursor, and more — direct, real-time access to your Kali Linux security toolchain and Burp Suite REST API.
+`kali-burp-mcp-bridge` (punto de entrada: **`server.py`**) es un **servidor del Model Context Protocol (MCP)** que proporciona a cualquier asistente de IA —Claude, ChatGPT, Cursor y otros— acceso directo y en tiempo real a tu conjunto de herramientas de seguridad de Kali Linux y a la API REST de Burp Suite.
 
-It bridges three powerful layers into one conversational interface:
+Integra tres capas potentes en una única interfaz conversacional:
 
 ```
 You ──► AI Chat ──► server.py (MCP Server) ──► 🔴 Burp Suite REST API
@@ -38,15 +38,15 @@ You ──► AI Chat ──► server.py (MCP Server) ──► 🔴 Burp Suite
                                            └──► 🟢 Pure Python Security Modules
 ```
 
-Instead of switching between terminals and GUI tools, you simply describe what you want:
+En lugar de alternar entre terminales y herramientas con interfaz gráfica, solo tienes que describir lo que quieres:
 
-> *"Scan 10.10.10.5 for open ports, identify services, and check for known CVEs"*
+> *«Escanea 10.10.10.5 en busca de puertos abiertos, identifica los servicios y comprueba los CVE conocidos»*
 
-And your AI assistant automatically calls `nmap_scan`, `whatweb_scan`, and `search_cve_by_keyword` for you.
+Y tu asistente de IA llamará automáticamente a `nmap_scan`, `whatweb_scan` y `search_cve_by_keyword` por ti.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Arquitectura
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
@@ -76,18 +76,18 @@ And your AI assistant automatically calls `nmap_scan`, `whatweb_scan`, and `sear
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Inicio rápido
 
-### Step 1 — Clone the Repo
+### Paso 1 — Clona el repositorio
 
 ```bash
 git clone https://github.com/yourusername/kali-burp-mcp-bridge.git
 cd kali-burp-mcp-bridge
 ```
 
-### Step 2 — Install Python Dependencies
+### Paso 2 — Instala las dependencias de Python
 
-The script uses inline PEP 723 dependency metadata, so you can use `uv` for zero-config setup:
+El script usa metadatos de dependencias PEP 723 insertados, por lo que puedes utilizar `uv` para configurarlo sin configuración adicional:
 
 ```bash
 # Option A — using uv (recommended, auto-installs all deps)
@@ -99,7 +99,7 @@ pip install "requests>=2,<3" "mcp>=1.2.0,<2" "flask>=3,<4" "websocket-client>=1.
 python3 server.py
 ```
 
-### Step 3 — Install Kali Security Tools
+### Paso 3 — Instala las herramientas de seguridad de Kali
 
 ```bash
 sudo apt-get update && sudo apt-get install -y \
@@ -120,29 +120,29 @@ go install github.com/projectdiscovery/dnsx/cmd/dnsx@latest
 go install github.com/ffuf/ffuf/v2@latest
 ```
 
-> You can also install any missing tool at any time by asking your AI: *"Install nuclei"* — the `install_tool` function handles apt, pip, and go automatically.
+> También puedes instalar cualquier herramienta que falte en cualquier momento pidiéndoselo a tu IA: *«Instala nuclei»*; la función `install_tool` gestiona apt, pip y go automáticamente.
 
-### Step 4 — Connect Your AI
+### Paso 4 — Conecta tu IA
 
-See the full connection guide below.
+Consulta la guía completa de conexión más abajo.
 
 ---
 
-## 🤖 Connecting Your AI
+## 🤖 Conecta tu IA
 
-### 🟣 Claude (Anthropic) — Claude Desktop App
+### 🟣 Claude (Anthropic) — Aplicación Claude Desktop
 
-Claude supports MCP natively via the Desktop app. This is the easiest and most powerful integration.
+Claude admite MCP de forma nativa mediante la aplicación Desktop. Esta es la integración más sencilla y potente.
 
-**Find your config file:**
+**Localiza tu archivo de configuración:**
 
-| OS | Path |
+| Sistema operativo | Ruta |
 |----|------|
 | macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
 | Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
 | Linux | `~/.config/Claude/claude_desktop_config.json` |
 
-**Add this to your config:**
+**Añade esto a tu configuración:**
 
 ```json
 {
@@ -160,9 +160,9 @@ Claude supports MCP natively via the Desktop app. This is the easiest and most p
 }
 ```
 
-Restart Claude Desktop. You will see the 🔧 tools icon in the chat interface confirming the MCP server is active.
+Reinicia Claude Desktop. Verás el icono de herramientas 🔧 en la interfaz de chat, lo que confirma que el servidor MCP está activo.
 
-**For a remote Kali machine, use SSE mode:**
+**Para una máquina Kali remota, utiliza el modo SSE:**
 
 ```bash
 # On your Kali machine
@@ -181,22 +181,22 @@ python3 server.py --transport sse --mcp-host 0.0.0.0 --mcp-port 8082
 
 ---
 
-### 🟢 Claude.ai (Web Interface)
+### 🟢 Claude.ai (Interfaz web)
 
-Claude.ai supports MCP via remote SSE connections.
+Claude.ai admite MCP mediante conexiones SSE remotas.
 
 ```bash
 # Start SSE server on your machine
 python3 server.py --transport sse --mcp-host 0.0.0.0 --mcp-port 8082
 ```
 
-In Claude.ai settings, navigate to **Integrations → Add MCP Server** and enter:
+En la configuración de Claude.ai, ve a **Integraciones → Añadir servidor MCP** e introduce:
 
 ```
 http://YOUR_IP:8082/sse
 ```
 
-> For claude.ai to reach your server over the internet, expose the port or use a tunnel:
+> Para que claude.ai pueda acceder a tu servidor a través de Internet, expón el puerto o utiliza un túnel:
 > ```bash
 > ngrok http 8082
 > # Then use the ngrok HTTPS URL in claude.ai
@@ -206,7 +206,7 @@ http://YOUR_IP:8082/sse
 
 ### 🟡 ChatGPT / OpenAI — Agents SDK
 
-ChatGPT connects via the SSE transport using the OpenAI Agents SDK.
+ChatGPT se conecta mediante el transporte SSE utilizando el OpenAI Agents SDK.
 
 ```bash
 # Start SSE server first
@@ -238,7 +238,7 @@ asyncio.run(main())
 
 ### 🔵 Cursor IDE
 
-Add to `~/.cursor/mcp.json`:
+Añade lo siguiente a `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -255,13 +255,13 @@ Add to `~/.cursor/mcp.json`:
 }
 ```
 
-Restart Cursor. The tools appear automatically in the AI chat panel.
+Reinicia Cursor. Las herramientas aparecerán automáticamente en el panel de chat de IA.
 
 ---
 
 ### 🟠 Windsurf (Codeium)
 
-Add to your Windsurf MCP configuration file:
+Añade lo siguiente a tu archivo de configuración MCP de Windsurf:
 
 ```json
 {
@@ -281,7 +281,7 @@ Add to your Windsurf MCP configuration file:
 
 ---
 
-### ⚪ Any MCP-Compatible Client (Generic SSE)
+### ⚪ Cualquier cliente compatible con MCP (SSE genérico)
 
 ```bash
 # Start in SSE mode
@@ -291,145 +291,145 @@ python3 server.py --transport sse --mcp-host 0.0.0.0 --mcp-port 8082
 # http://YOUR_HOST:8082/sse
 ```
 
-This works with LangChain MCP adapters, CrewAI, AutoGen, LlamaIndex, and any framework that supports the MCP SSE transport protocol.
+Esto funciona con adaptadores MCP de LangChain, CrewAI, AutoGen, LlamaIndex y cualquier framework compatible con el protocolo de transporte SSE de MCP.
 
 ---
 
-## 🔧 Available Tools
+## 🔧 Herramientas disponibles
 
-### 🌐 Network Scanning
+### 🌐 Escaneo de red
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `nmap_scan` | Port and service scan with custom flags (e.g. `-sV -T4 --open`) |
-| `nmap_vuln_scan` | Run all Nmap vuln NSE scripts against a target |
-| `nmap_os_detect` | OS fingerprinting with `-O -sV -A` |
-| `nmap_full_port_scan` | Scan all 65535 ports (slow but thorough) |
-| `nmap_udp_scan` | UDP scan for top N ports (requires root) |
-| `nmap_script` | Run any specific NSE script (e.g. `smb-vuln-ms17-010`) |
-| `masscan_fast` | Ultra-fast packet-level port sweep with configurable rate |
+| `nmap_scan` | Escaneo de puertos y servicios con flags personalizados (por ejemplo, `-sV -T4 --open`) |
+| `nmap_vuln_scan` | Ejecuta todos los scripts NSE de vulnerabilidades de Nmap contra un objetivo |
+| `nmap_os_detect` | Identificación del sistema operativo con `-O -sV -A` |
+| `nmap_full_port_scan` | Escanea los 65535 puertos (lento, pero exhaustivo) |
+| `nmap_udp_scan` | Escaneo UDP de los N puertos principales (requiere root) |
+| `nmap_script` | Ejecuta cualquier script NSE específico (por ejemplo, `smb-vuln-ms17-010`) |
+| `masscan_fast` | Barrido de puertos a nivel de paquetes ultrarrápido y con tasa configurable |
 
-### 🕸️ Web Scanning and Fuzzing
+### 🕸️ Escaneo web y fuzzing
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `nikto_scan` | Web server vulnerability scan by host and port |
-| `nikto_scan_url` | Nikto scan using a full URL (auto-detects HTTPS) |
-| `gobuster_dir` | Directory and file brute-force with extension support |
-| `gobuster_dns` | Subdomain brute-force via DNS resolution |
-| `gobuster_vhost` | Virtual host enumeration |
-| `dirb_scan` | Classic directory scan (fallback when gobuster unavailable) |
-| `ffuf_dir` | Fast web directory fuzzing using FUZZ placeholder |
-| `ffuf_param` | Parameter fuzzing with custom HTTP method and POST data |
-| `wpscan` | WordPress scanner for users, plugins, themes, and timthumbs |
-| `nuclei_scan` | Template-based vulnerability scanning (community templates) |
-| `nuclei_scan_list` | Nuclei against a file containing multiple target URLs |
-| `whatweb_scan` | Web technology fingerprinting with configurable aggression |
+| `nikto_scan` | Escaneo de vulnerabilidades del servidor web por host y puerto |
+| `nikto_scan_url` | Escaneo con Nikto utilizando una URL completa (detecta HTTPS automáticamente) |
+| `gobuster_dir` | Fuerza bruta de directorios y archivos con compatibilidad para extensiones |
+| `gobuster_dns` | Fuerza bruta de subdominios mediante resolución DNS |
+| `gobuster_vhost` | Enumeración de hosts virtuales |
+| `dirb_scan` | Escaneo clásico de directorios (alternativa cuando gobuster no está disponible) |
+| `ffuf_dir` | Fuzzing rápido de directorios web mediante el marcador FUZZ |
+| `ffuf_param` | Fuzzing de parámetros con método HTTP y datos POST personalizados |
+| `wpscan` | Scanner de WordPress para usuarios, plugins, temas y timthumbs |
+| `nuclei_scan` | Escaneo de vulnerabilidades basado en plantillas (plantillas de la comunidad) |
+| `nuclei_scan_list` | Ejecuta Nuclei contra un archivo que contiene varias URL objetivo |
+| `whatweb_scan` | Identificación de tecnologías web con agresividad configurable |
 
-### 💉 SQL Injection
+### 💉 Inyección SQL
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `sqlmap_scan` | Full SQL injection test on a URL |
-| `sqlmap_dbs` | Enumerate available databases |
-| `sqlmap_tables` | Enumerate tables within a specific database |
-| `sqlmap_dump` | Dump data from a database or table |
-| `sqlmap_os_shell` | Attempt OS command execution via SQLi |
-| `sqlmap_request_file` | Test from a saved Burp Suite request file |
+| `sqlmap_scan` | Prueba completa de inyección SQL en una URL |
+| `sqlmap_dbs` | Enumera las bases de datos disponibles |
+| `sqlmap_tables` | Enumera las tablas de una base de datos específica |
+| `sqlmap_dump` | Extrae datos de una base de datos o tabla |
+| `sqlmap_os_shell` | Intenta ejecutar comandos del sistema operativo mediante SQLi |
+| `sqlmap_request_file` | Prueba a partir de un archivo de solicitud de Burp Suite guardado |
 
-### 🔐 Brute Force and Hash Cracking
+### 🔐 Fuerza bruta y cracking de hashes
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `hydra_ssh` | SSH credential brute-force |
-| `hydra_ftp` | FTP credential brute-force |
-| `hydra_smb` | SMB credential brute-force |
-| `hydra_http_post` | HTTP POST login form attack with fail string |
-| `hydra_service` | Generic service attack (rdp, smtp, mysql, mssql, telnet, etc.) |
-| `john_crack` | John the Ripper with wordlist and optional rules |
-| `john_show` | Display previously cracked passwords |
-| `hashcat_crack` | GPU-accelerated cracking (MD5, NTLM, SHA1, bcrypt, etc.) |
+| `hydra_ssh` | Fuerza bruta de credenciales SSH |
+| `hydra_ftp` | Fuerza bruta de credenciales FTP |
+| `hydra_smb` | Fuerza bruta de credenciales SMB |
+| `hydra_http_post` | Ataque al formulario de inicio de sesión HTTP POST con cadena de fallo |
+| `hydra_service` | Ataque contra servicios genéricos (rdp, smtp, mysql, mssql, telnet, etc.) |
+| `john_crack` | John the Ripper con wordlist y reglas opcionales |
+| `john_show` | Muestra las contraseñas descifradas anteriormente |
+| `hashcat_crack` | Cracking acelerado por GPU (MD5, NTLM, SHA1, bcrypt, etc.) |
 
-### 💣 Exploitation — Metasploit
+### 💣 Explotación — Metasploit
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `msf_exploit` | Run an exploit with RHOSTS, LHOST, LPORT, PAYLOAD options |
-| `msf_generate_payload` | msfvenom payload generation (exe, elf, apk, ps1, dll, raw) |
-| `msf_search` | Search the Metasploit module database by keyword |
-| `msf_module_info` | Get detailed information on a specific module |
-| `msf_run_resource` | Execute a full multi-line Metasploit .rc resource script |
+| `msf_exploit` | Ejecuta un exploit con las opciones RHOSTS, LHOST, LPORT y PAYLOAD |
+| `msf_generate_payload` | Generación de payloads con msfvenom (exe, elf, apk, ps1, dll, raw) |
+| `msf_search` | Busca en la base de datos de módulos de Metasploit por palabra clave |
+| `msf_module_info` | Obtiene información detallada sobre un módulo específico |
+| `msf_run_resource` | Ejecuta un script de recursos .rc de Metasploit completo y multilínea |
 
-### 🔍 Reconnaissance and OSINT
+### 🔍 Reconocimiento y OSINT
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `subfinder_enum` | Passive subdomain enumeration via OSINT sources |
-| `amass_enum` | Active and passive subdomain mapping |
-| `enumerate_subdomains` | crt.sh certificate transparency logs plus DNS resolution |
-| `fierce_dns` | DNS reconnaissance and zone transfer attempts |
-| `dnsx_resolve` | Fast DNS resolution with A, CNAME, MX, NS records |
-| `whois_lookup` | WHOIS data for a domain or IP address |
-| `dig_query` | DNS query for any record type via any nameserver |
-| `enum4linux` | SMB and LDAP enumeration for shares, users, and groups |
-| `smbclient_list_shares` | List SMB shares on a target |
-| `smbclient_connect` | Connect to an SMB share and execute commands |
-| `github_repo_secret_scan` | Scan GitHub repo commits for exposed API keys and secrets |
+| `subfinder_enum` | Enumeración pasiva de subdominios mediante fuentes OSINT |
+| `amass_enum` | Mapeo activo y pasivo de subdominios |
+| `enumerate_subdomains` | Registros de transparencia de certificados de crt.sh más resolución DNS |
+| `fierce_dns` | Reconocimiento DNS e intentos de transferencia de zona |
+| `dnsx_resolve` | Resolución DNS rápida con registros A, CNAME, MX y NS |
+| `whois_lookup` | Datos WHOIS de un dominio o dirección IP |
+| `dig_query` | Consulta DNS de cualquier tipo de registro mediante cualquier servidor de nombres |
+| `enum4linux` | Enumeración SMB y LDAP de recursos compartidos, usuarios y grupos |
+| `smbclient_list_shares` | Enumera los recursos compartidos SMB de un objetivo |
+| `smbclient_connect` | Conecta a un recurso compartido SMB y ejecuta comandos |
+| `github_repo_secret_scan` | Escanea los commits de un repositorio de GitHub en busca de claves API y secretos expuestos |
 
-### 🔑 JWT and Authentication Testing
+### 🔑 JWT y pruebas de autenticación
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `jwt_decode` | Decode JWT header and payload, detect algorithm and expiry issues |
-| `jwt_forge_none_alg` | Generate `alg:none` bypass tokens (4 casing variants) |
-| `jwt_brute_secret` | Brute-force HS256 secret against common passwords or a wordlist |
-| `analyze_oauth_flow` | Detect OAuth misconfigurations: implicit flow, missing state, missing PKCE |
+| `jwt_decode` | Decodifica la cabecera y el payload JWT, y detecta problemas de algoritmo y expiración |
+| `jwt_forge_none_alg` | Genera tokens de bypass `alg:none` (4 variantes de mayúsculas/minúsculas) |
+| `jwt_brute_secret` | Fuerza bruta del secreto HS256 contra contraseñas comunes o una wordlist |
+| `analyze_oauth_flow` | Detecta errores de configuración de OAuth: flujo implícito, ausencia de state y ausencia de PKCE |
 
-### 🕵️ Advanced Web Vulnerability Testing
+### 🕵️ Pruebas avanzadas de vulnerabilidades web
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `test_cors_misconfiguration` | Test CORS policy for origin reflection and credential leakage |
-| `detect_request_smuggling` | Raw socket HTTP smuggling detection (CL.TE and TE.CL techniques) |
-| `test_host_header_injection` | Host header injection via X-Forwarded-Host and OOB Collaborator |
-| `detect_cache_poisoning` | Unkeyed header cache poisoning detection |
-| `probe_ssrf` | SSRF via AWS/GCP/Azure metadata endpoints and Burp Collaborator OOB |
-| `scan_open_redirects` | Open redirect scanning across common URL parameters |
-| `mine_hidden_parameters` | Discover hidden parameters by comparing response length and status |
-| `graphql_introspect` | GraphQL schema extraction via introspection query |
-| `discover_api_endpoints_from_js` | Extract API paths, secrets, and external URLs from JavaScript files |
-| `analyze_session_entropy` | Token entropy analysis and sequential pattern detection |
+| `test_cors_misconfiguration` | Prueba la política CORS para detectar reflexión del origen y filtración de credenciales |
+| `detect_request_smuggling` | Detección de HTTP request smuggling mediante sockets sin procesar (técnicas CL.TE y TE.CL) |
+| `test_host_header_injection` | Inyección de la cabecera Host mediante X-Forwarded-Host y Collaborator OOB |
+| `detect_cache_poisoning` | Detección de envenenamiento de caché mediante cabeceras no incluidas en la clave |
+| `probe_ssrf` | SSRF mediante endpoints de metadatos de AWS/GCP/Azure y Collaborator OOB de Burp |
+| `scan_open_redirects` | Escaneo de redirecciones abiertas en parámetros de URL habituales |
+| `mine_hidden_parameters` | Descubre parámetros ocultos comparando la longitud y el estado de las respuestas |
+| `graphql_introspect` | Extrae el esquema GraphQL mediante una consulta de introspección |
+| `discover_api_endpoints_from_js` | Extrae rutas de API, secretos y URL externas de archivos JavaScript |
+| `analyze_session_entropy` | Análisis de entropía de tokens y detección de patrones secuenciales |
 
-### 🎯 Payloads and Exploit Templates
+### 🎯 Payloads y plantillas de exploits
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `get_payloads` | Return payloads for: sqli, xss, ssti, ssrf, xxe, lfi, cmd_injection, open_redirect |
-| `get_all_payload_types` | List all available payload categories |
-| `generate_exploit_template` | Generate a ready-to-run Python exploit script for a vulnerability type |
-| `auto_exploit_from_scan` | Pull Burp scanner findings and auto-generate exploit scripts per issue |
-| `build_intruder_attack` | Load Burp Intruder with generated payloads for a given attack type |
+| `get_payloads` | Devuelve payloads para: sqli, xss, ssti, ssrf, xxe, lfi, cmd_injection, open_redirect |
+| `get_all_payload_types` | Enumera todas las categorías de payload disponibles |
+| `generate_exploit_template` | Genera un script de exploit Python listo para ejecutar para un tipo de vulnerabilidad |
+| `auto_exploit_from_scan` | Obtiene los hallazgos del scanner de Burp y genera automáticamente scripts de exploit para cada incidencia |
+| `build_intruder_attack` | Configura Burp Intruder con payloads generados para un tipo de ataque determinado |
 
-### 🔬 CVE Intelligence
+### 🔬 Inteligencia sobre CVE
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `lookup_cve` | Full CVE details from NVD including CVSS v3 score and references |
-| `search_cve_by_keyword` | Keyword-based CVE search against the NVD database |
-| `tech_to_cves` | Map a detected technology and version to known CVEs |
-| `github_advisory_search` | GitHub Security Advisories by ecosystem, severity, or keyword |
+| `lookup_cve` | Detalles completos del CVE desde NVD, incluida la puntuación CVSS v3 y las referencias |
+| `search_cve_by_keyword` | Búsqueda de CVE por palabras clave en la base de datos NVD |
+| `tech_to_cves` | Relaciona una tecnología y versión detectadas con los CVE conocidos |
+| `github_advisory_search` | Busca avisos de seguridad de GitHub por ecosistema, severidad o palabra clave |
 
-### 🔒 SSL and TLS Testing
+### 🔒 Pruebas SSL y TLS
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `sslscan` | Test SSL/TLS ciphers, protocols, and known vulnerabilities |
-| `testssl` | Comprehensive TLS testing with testssl.sh |
-| `openssl_check_cert` | Display full certificate chain and certificate details |
+| `sslscan` | Prueba cifrados, protocolos y vulnerabilidades conocidas de SSL/TLS |
+| `testssl` | Pruebas exhaustivas de TLS con testssl.sh |
+| `openssl_check_cert` | Muestra la cadena completa del certificado y sus detalles |
 
-### 🌊 Burp Suite REST API
+### 🌊 API REST de Burp Suite
 
-| Category | Tools |
+| Categoría | Herramientas |
 |----------|-------|
 | **Proxy** | `get_proxy_http_history`, `get_proxy_http_history_regex`, `get_proxy_websocket_history`, `get_proxy_websocket_history_regex`, `set_proxy_intercept_state` |
 | **Scanner** | `burp_active_scan`, `burp_passive_scan`, `burp_get_scan_status`, `burp_cancel_scan`, `get_scanner_issues` |
@@ -439,30 +439,48 @@ This works with LangChain MCP adapters, CrewAI, AutoGen, LlamaIndex, and any fra
 | **Encoding** | `base64_encode`, `base64_decode`, `url_encode`, `url_decode`, `generate_random_string` |
 | **Config** | `output_project_options`, `output_user_options`, `set_project_options`, `set_user_options`, `set_task_execution_engine_state`, `get_active_editor_contents`, `set_active_editor_contents` |
 
-### ⚙️ System and Workflow Tools
+### ⚙️ Herramientas del sistema y del flujo de trabajo
 
-| Tool | Description |
+| Herramienta | Descripción |
 |------|-------------|
-| `recon_target` | Full recon pipeline: nmap + whatweb + whois + subdomains + CVE hints |
-| `full_web_audit` | Complete web audit: nikto + gobuster + CORS + param mining + JS analysis |
-| `chain_vulnerabilities_into_narrative` | Build structured attack chain narratives from Burp scanner findings |
-| `list_all_tools` | List every available tool organized by category |
-| `list_installed_tools` | Show which Kali tools are installed vs missing |
-| `install_tool` | Auto-install any missing tool via apt-get, pip, or go install |
-| `install_wordlists` | Install rockyou, dirb, and SecLists wordlists |
-| `run_command` | Execute any arbitrary bash command directly |
-| `curl_request` | HTTP request with full control over method, headers, data, and proxy |
-| `wget_download` | Download files from a URL |
-| `nc_banner_grab` | Service banner grabbing via netcat |
-| `burp_health_check` | Verify Burp REST API connectivity |
+| `recon_target` | Pipeline completo de reconocimiento: nmap + whatweb + whois + subdominios + indicios de CVE |
+| `full_web_audit` | Auditoría web completa: nikto + gobuster + CORS + extracción de parámetros + análisis de JS |
+| `chain_vulnerabilities_into_narrative` | Construye narrativas estructuradas de cadenas de ataque a partir de hallazgos del scanner de Burp |
+| `list_all_tools` | Enumera todas las herramientas disponibles organizadas por categoría |
+| `list_installed_tools` | Muestra qué herramientas de Kali están instaladas y cuáles faltan |
+| `install_tool` | Instala automáticamente cualquier herramienta que falte mediante apt-get, pip o go install |
+| `install_wordlists` | Instala las wordlists rockyou, dirb y SecLists |
+| `run_command` | Ejecuta directamente cualquier comando bash arbitrario |
+| `curl_request` | Solicitud HTTP con control total sobre método, cabeceras, datos y proxy |
+| `wget_download` | Descarga archivos desde una URL |
+| `nc_banner_grab` | Obtiene banners de servicios mediante netcat |
+| `burp_health_check` | Verifica la conectividad con la API REST de Burp |
+
+### 🤝 Flujo de Pentest Asistido (Validación con Humano en el Bucle)
+
+Una capa de validación que mantiene al pentester como autoridad final: la IA sugiere/reproduce pruebas, BurpIA hace un segundo análisis con LLM y **tú validas manualmente en Repeater antes de reportar nada**. Los hallazgos se centralizan en un registro de sesión y avanzan por los estados `suggested → llm_reviewed → manually_validated → reported`.
+
+| Herramienta | Descripción |
+|------|-------------|
+| `finding_add` | Registra un hallazgo en el registro central (inicia como `suggested`) |
+| `finding_list` | Lista los hallazgos, filtrados por estado o severidad |
+| `finding_update_status` | Avanza un hallazgo por el pipeline de validación |
+| `finding_report` | Genera un reporte tipo PoC — **solo tras `manually_validated`** |
+| `burp_get_filtered_issues` | Filtra los hallazgos del scanner de Burp (severidad/confianza/url) y opcionalmente los importa como findings |
+| `send_for_second_analysis` | Fuerza un segundo análisis LLM de BurpIA vía el header `X-BurpIA-AutoAnalyze`, incluso cuando no coincide con los filtros estándar |
+| `validation_workflow` | Orquesta el flujo de 3 pasos (sugerir → análisis LLM → checkpoint manual obligatorio); nunca reporta solo |
+| `checklist_show` / `checklist_check` / `checklist_reset` | Mantiene el checklist del pentester (basado en OWASP WSTG) durante todo el engagement |
+| `workflow_cost_report` | Muestra los contadores de llamadas a Burp/LLM y guía para reducir costos |
+
+> Esta capa integra lo mejor de un flujo de validación Burp + BurpIA + MCP: hallazgos centralizados, filtrado de hallazgos del scanner, un segundo análisis LLM forzado y un checkpoint de validación humana obligatorio — sobre todo el toolset de Kali + Burp.
 
 ---
 
-## 📖 Usage Examples
+## 📖 Ejemplos de uso
 
-Once `server.py` is connected to your AI assistant, just speak naturally:
+Una vez conectado `server.py` a tu asistente de IA, solo tienes que hablar con naturalidad:
 
-### Reconnaissance
+### Reconocimiento
 
 ```
 "Run a full port scan on 10.10.10.5 and identify all running services"
@@ -472,7 +490,7 @@ Once `server.py` is connected to your AI assistant, just speak naturally:
 "Check what web technologies are running on https://target.com"
 ```
 
-### Web Application Testing
+### Pruebas de aplicaciones web
 
 ```
 "Test https://target.com for SQL injection vulnerabilities"
@@ -484,7 +502,7 @@ Once `server.py` is connected to your AI assistant, just speak naturally:
 "Extract API endpoints and secrets from https://target.com/app.bundle.js"
 ```
 
-### JWT and Authentication
+### JWT y autenticación
 
 ```
 "Decode this JWT and check for vulnerabilities: eyJhbGciOiJIUzI1NiJ9..."
@@ -493,7 +511,7 @@ Once `server.py` is connected to your AI assistant, just speak naturally:
 "Analyze this OAuth authorization URL for security issues"
 ```
 
-### Exploitation
+### Explotación
 
 ```
 "Generate a Windows x64 reverse shell payload for 192.168.1.10 port 4444"
@@ -504,7 +522,7 @@ Once `server.py` is connected to your AI assistant, just speak naturally:
 "Search Metasploit for Apache Struts exploit modules"
 ```
 
-### Intelligence
+### Inteligencia
 
 ```
 "What CVEs affect Apache 2.4.49?"
@@ -513,7 +531,7 @@ Once `server.py` is connected to your AI assistant, just speak naturally:
 "Map all known CVEs for nginx 1.14.0"
 ```
 
-### Burp Suite Automation
+### Automatización de Burp Suite
 
 ```
 "Get the last 100 requests from Burp proxy history"
@@ -526,18 +544,18 @@ Once `server.py` is connected to your AI assistant, just speak naturally:
 
 ---
 
-## ⚙️ Configuration Reference
+## ⚙️ Referencia de configuración
 
-### Environment Variables
+### Variables de entorno
 
-| Variable | Default | Description |
+| Variable | Valor por defecto | Descripción |
 |----------|---------|-------------|
-| `BURP_URL` | `http://127.0.0.1:9876` | Burp Suite REST API endpoint |
-| `BURP_API_KEY` | *(empty)* | API key for Burp authentication if required |
-| `TOOL_TIMEOUT` | `120` | Maximum execution time in seconds for CLI tools |
-| `TIMEOUT` | `30` | HTTP request timeout in seconds |
+| `BURP_URL` | `http://127.0.0.1:9876` | Endpoint de la API REST de Burp Suite |
+| `BURP_API_KEY` | *(vacío)* | Clave API para la autenticación de Burp, si es necesaria |
+| `TOOL_TIMEOUT` | `120` | Tiempo máximo de ejecución, en segundos, para las herramientas CLI |
+| `TIMEOUT` | `30` | Tiempo de espera de las solicitudes HTTP, en segundos |
 
-### Command Line Flags
+### Opciones de línea de comandos
 
 ```
 python3 server.py [OPTIONS]
@@ -552,7 +570,7 @@ python3 server.py [OPTIONS]
   --debug                Enable debug logging
 ```
 
-### Common Launch Commands
+### Comandos habituales de ejecución
 
 ```bash
 # Default stdio mode — for Claude Desktop, Cursor, local AI tools
@@ -580,49 +598,49 @@ python3 server.py \
 
 ---
 
-## 🔌 Burp Suite Setup
+## 🔌 Configuración de Burp Suite
 
-To enable the Burp Suite REST API layer:
+Para activar la capa de API REST de Burp Suite:
 
-1. Install **Burp Suite Professional** or **Community Edition** from [portswigger.net/burp](https://portswigger.net/burp)
-2. Open Burp Suite and go to the **BApp Store**
-3. Install the **BurpAI** extension (search for "BurpAI" or "Burp MCP")
-4. The extension starts a REST server on `http://127.0.0.1:9876` automatically
-5. Launch `server.py` — it connects to Burp automatically
+1. Instala **Burp Suite Professional** o **Community Edition** desde [portswigger.net/burp](https://portswigger.net/burp)
+2. Abre Burp Suite y ve a **BApp Store**
+3. Instala la extensión **BurpAI** (busca "BurpAI" o "Burp MCP")
+4. La extensión inicia automáticamente un servidor REST en `http://127.0.0.1:9876`
+5. Ejecuta `server.py`; se conectará automáticamente a Burp
 
-> Without Burp Suite, all Kali CLI tools and Pure Python security modules work perfectly. Burp integration is optional but unlocks scanner results, proxy history, Collaborator OOB interactions, and Intruder automation.
-
----
-
+> Sin Burp Suite, todas las herramientas CLI de Kali y los módulos de seguridad de Python puro funcionan perfectamente. La integración con Burp es opcional, pero habilita los resultados del scanner, el historial del proxy, las interacciones OOB de Collaborator y la automatización de Intruder.
 
 ---
 
-## 🔐 Security Considerations
-
-- Only run this tool against systems you **own or have explicit written authorization** to test
-- The `run_command` tool provides full shell access — run in a VM or container for isolation
-- Bind the SSE server to `127.0.0.1` unless you have proper network-level access controls in place
-- Keep `BURP_API_KEY` secret and rotate it regularly
-- Output files and tool logs may contain sensitive data — handle and store them securely
-- Set conservative `TOOL_TIMEOUT` values to prevent long-running or runaway processes
 
 ---
 
-## 🙏 Credits
+## 🔐 Consideraciones de seguridad
 
-This project stands on the shoulders of giants in the security community.
+- Ejecuta esta herramienta únicamente contra sistemas que **sean de tu propiedad o para los que tengas autorización explícita y por escrito**
+- La herramienta `run_command` proporciona acceso completo al shell; ejecútala en una VM o contenedor para aislarla
+- Vincula el servidor SSE a `127.0.0.1` salvo que dispongas de controles de acceso adecuados a nivel de red
+- Mantén `BURP_API_KEY` en secreto y rótala periódicamente
+- Los archivos de salida y los logs de las herramientas pueden contener datos sensibles; gestiónalos y almacénalos de forma segura
+- Establece valores prudentes para `TOOL_TIMEOUT` para evitar procesos de larga duración o descontrolados
+
+---
+
+## 🙏 Créditos
+
+Este proyecto se apoya en el trabajo de grandes referentes de la comunidad de seguridad.
 
 ### 👤 Daniel S. — PortSwigger
 
-For pioneering and publishing the foundational web application security research that powers this bridge. The CORS testing, HTTP request smuggling detection, web cache poisoning, Host header injection, and OAuth misconfiguration modules are all directly inspired by PortSwigger's world-class research. The [Web Security Academy](https://portswigger.net/web-security) is the best free security training resource on the planet, and Burp Suite Pro is the industry-standard tool that makes the REST API integration layer possible.
+Por iniciar y publicar la investigación fundamental sobre seguridad de aplicaciones web en la que se basa este bridge. Los módulos de pruebas de CORS, detección de HTTP request smuggling, envenenamiento de caché web, inyección de la cabecera Host y errores de configuración de OAuth están inspirados directamente en la investigación de primer nivel de PortSwigger. La [Web Security Academy](https://portswigger.net/web-security) es el mejor recurso gratuito de formación en seguridad del mundo, y Burp Suite Pro es la herramienta estándar del sector que hace posible la capa de integración con la API REST.
 
 ### 👤 Daniel Allen
 
-For contributions to the real-world penetration testing workflows, (PortSwigger MCP - Extension)
+Por sus contribuciones a los flujos de trabajo de pruebas de penetración del mundo real (PortSwigger MCP - Extension)
 
-### 🛠️ Open Source Tools Integrated
+### 🛠️ Herramientas de código abierto integradas
 
-| Tool | Author / Project |
+| Herramienta | Autor / Proyecto |
 |------|-----------------|
 | [Nmap](https://nmap.org) | Gordon Lyon (Fyodor) |
 | [Metasploit Framework](https://metasploit.com) | Rapid7 |
@@ -646,18 +664,18 @@ For contributions to the real-world penetration testing workflows, (PortSwigger 
 
 ---
 
-## 📄 License
+## 📄 Licencia
 
-MIT License — see [LICENSE](LICENSE) for full terms.
+Licencia MIT — consulta [LICENSE](LICENSE) para conocer los términos completos.
 
 ---
 
 <div align="center">
 
-**Built with ❤️ for the security research community**
+**Creado con ❤️ para la comunidad de investigación de seguridad**
 
-*For authorized testing only. Hack responsibly.*
+*Solo para pruebas autorizadas. Practica el hacking de forma responsable.*
 
-⭐ **Star this repo** if it helped your work!
+⭐ **Da una estrella a este repositorio** si te ha ayudado.
 
 </div>
